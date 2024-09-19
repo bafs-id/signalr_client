@@ -41,7 +41,7 @@ class WebSocketTransport implements ITransport {
     Map<String, dynamic> headers = {};
 
     if (_accessTokenFactory != null) {
-      final token = await _accessTokenFactory!();
+      final token = await _accessTokenFactory();
       if (!isStringEmpty(token)) {
         headers['Authorization'] = 'Bearer $token';
       }
