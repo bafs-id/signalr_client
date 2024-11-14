@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:logging/logging.dart';
+import 'package:signalr_netcore/ihub_protocol.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -16,6 +17,8 @@ class WebSocketTransport implements ITransport {
   final Logger? _logger;
   final AccessTokenFactory? _accessTokenFactory;
   final bool _logMessageContent;
+  final Map<String, dynamic> headers;
+
   WebSocketChannel? _webSocket;
   StreamSubscription<Object?>? _webSocketListenSub;
 
@@ -26,19 +29,21 @@ class WebSocketTransport implements ITransport {
   OnReceive? onReceive;
 
   // Methods
-  WebSocketTransport(AccessTokenFactory? accessTokenFactory, Logger? logger,
-      bool logMessageContent)
-      : _accessTokenFactory = accessTokenFactory,
+  WebSocketTransport(
+    AccessTokenFactory? accessTokenFactory,
+    Logger? logger,
+    bool logMessageContent,
+    MessageHeaders? headers,
+  )   : _accessTokenFactory = accessTokenFactory,
         _logger = logger,
-        _logMessageContent = logMessageContent;
+        _logMessageContent = logMessageContent,
+        headers = headers?.asMap ?? {};
 
   @override
   Future<void> connect(String? url, TransferFormat transferFormat) async {
     assert(url != null);
 
     _logger?.finest("(WebSockets transport) Connecting");
-
-    Map<String, dynamic> headers = {};
 
     if (_accessTokenFactory != null) {
       final token = await _accessTokenFactory();
